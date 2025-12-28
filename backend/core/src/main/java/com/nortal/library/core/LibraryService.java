@@ -82,6 +82,12 @@ public class LibraryService {
     if (entity.getReservationQueue().contains(memberId)) {
       return Result.failure("ALREADY_RESERVED_BY_MEMBER");
     }
+    if (entity.getLoanedTo() == null && entity.getReservationQueue().isEmpty()) {
+        entity.setLoanedTo(memberId);
+        entity.setDueDate(LocalDate.now().plusDays(DEFAULT_LOAN_DAYS));
+        bookRepository.save(entity);
+        return Result.success();
+    }
     entity.getReservationQueue().add(memberId);
     bookRepository.save(entity);
     return Result.success();
