@@ -45,14 +45,16 @@ public class LibraryService {
   public ResultWithNext returnBook(String bookId, String memberId) {
     Optional<Book> book = bookRepository.findById(bookId);
     if (book.isEmpty()) {
-      return ResultWithNext.failure();
-    }
-
+        return ResultWithNext.failure();
+    } 
     Book entity = book.get();
+    if (!memberId.equals(entity.getLoanedTo())) {
+        return ResultWithNext.failure();
+    }
     entity.setLoanedTo(null);
     entity.setDueDate(null);
-    String nextMember =
-        entity.getReservationQueue().isEmpty() ? null : entity.getReservationQueue().get(0);
+    String nextMember = entity.getReservationQueue().isEmpty() ? null
+            : new ArrayList<>(entity.getReservationQueue()).get(0); 
     bookRepository.save(entity);
     return ResultWithNext.success(nextMember);
   }
