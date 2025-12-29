@@ -67,7 +67,12 @@ public class LibraryService {
         nextEligible = queuedMemberId;
         break;
       }
-    }        
+    } 
+    if (nextEligible != null) {
+    entity.setLoanedTo(nextEligible);
+    entity.setDueDate(LocalDate.now().plusDays(DEFAULT_LOAN_DAYS));
+    entity.getReservationQueue().remove(nextEligible);
+}       
     bookRepository.save(entity);
     return ResultWithNext.success(nextEligible);
   }
