@@ -3,6 +3,7 @@ package com.nortal.library.persistence.adapter;
 import com.nortal.library.core.domain.Book;
 import com.nortal.library.core.port.BookRepository;
 import com.nortal.library.persistence.jpa.JpaBookRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Repository;
 public class BookRepositoryAdapter implements BookRepository {
 
   private final JpaBookRepository jpaRepository;
+
+  private final List<Book> books = new ArrayList<>();
 
   public BookRepositoryAdapter(JpaBookRepository jpaRepository) {
     this.jpaRepository = jpaRepository;
@@ -39,5 +42,16 @@ public class BookRepositoryAdapter implements BookRepository {
   @Override
   public boolean existsById(String id) {
     return jpaRepository.existsById(id);
+  }
+
+  @Override
+  public int countByLoanedTo(String memberId) {
+    int count = 0;
+    for (Book book : books) {
+      if (memberId.equals(book.getLoanedTo())) {
+        count++;
+      }
+    }
+    return count;
   }
 }
