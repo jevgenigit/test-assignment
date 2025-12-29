@@ -61,12 +61,20 @@ public class LibraryService {
     }
     entity.setLoanedTo(null);
     entity.setDueDate(null);
-    String nextMember =
-        entity.getReservationQueue().isEmpty()
-            ? null
-            : new ArrayList<>(entity.getReservationQueue()).get(0);
+    String nextEligible = null;
+    for (String queuedMemberId : entity.getReservationQueue()) {
+      if (canMemberBorrow(queuedMemberId)) {
+        nextEligible = queuedMemberId;
+        break;
+      }
+    } 
+    if (nextEligible != null) {
+    entity.setLoanedTo(nextEligible);
+    entity.setDueDate(LocalDate.now().plusDays(DEFAULT_LOAN_DAYS));
+    entity.getReservationQueue().remove(nextEligible);
+}       
     bookRepository.save(entity);
-    return ResultWithNext.success(nextMember);
+    return ResultWithNext.success(nextEligible);
   }
 
   public Result reserveBook(String bookId, String memberId) {
